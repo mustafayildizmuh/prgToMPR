@@ -1,0 +1,18 @@
+﻿<Page
+    x:Class="prgToMPR02.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:prgToMPR02"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1311" Height="760">
+
+    <Grid Margin="5,5,5,5" Width="1270" Height="720">
+        <Button Content="Dizin Seç" Margin="32,27,0,0" VerticalAlignment="Top" Click="Button_Click"/>
+        <TextBox x:Name="TextBoxOutput" HorizontalAlignment="Left" Margin="32,107,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"  AcceptsReturn="True" Height="504" Width="275"/>
+        <TextBlock HorizontalAlignment="Left" Margin="32,77,0,0" TextWrapping="Wrap" Text="İşlenenen Dosyalar:" VerticalAlignment="Top"/>
+        <TextBlock x:Name="TextBlock_Dir" HorizontalAlignment="Left" Margin="127,34,0,0" TextWrapping="Wrap" Text="Dizin : " VerticalAlignment="Top"/>
+
+    </Grid>
+</Page>
