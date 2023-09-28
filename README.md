@@ -1,5 +1,5 @@
 # prgToMPR02
 
-This Program inted to convert MasterWood - MasterWork with PRG extention files to Homag - WoodWop 7.0 with MPR extention files.
+This program is designed to convert MasterWood - MasterWork files with the PRG extension to Homag - WoodWop 7.0 files with the MPR extension.
 
-Currently conversations works on any holes and milings except milings include round moves. Also Pockets are not working yet
+Currently, the conversion works for any holes and millings except for millings that include circular movements. Additionally, pocket operations are not yet supported.
