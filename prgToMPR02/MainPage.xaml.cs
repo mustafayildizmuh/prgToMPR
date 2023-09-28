@@ -75,7 +75,7 @@ namespace prgToMPR02
                 string mprIcerik = ConvertPRGtoMPR(dosyaIcerigi, dosyaAdi);
 
                 // Dosya içeriğini TextBox içine ekleyin
-                TextBoxOutput.Text = $"Dizin : {dosyaAdi}\n";
+                TextBoxOutput.Text += $"Folder : {dosyaAdi}\n";
                 //TextBoxOutput.Text += $"{dosyaIcerigi}\n\n";
 
                 if (!string.IsNullOrEmpty(mprIcerik))
