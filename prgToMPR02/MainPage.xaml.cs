@@ -34,18 +34,18 @@ namespace prgToMPR02
             if (folder != null)
             {
                 // Print out Dir
-                TextBlock_Dir.Text +=  folder.Path;
+                TextBlock_Dir.Text += folder.Path;
 
                 // Find all PRG files in the selected directory
                 IReadOnlyList<StorageFile> prgFiles = await folder.GetFilesAsync();
-                List<string> dosyaIcerikleri = new List<string>();
+                List<string> fileContents = new List<string>();
 
                 foreach (StorageFile file in prgFiles)
                 {
                     try
                     {
-                        string dosyaIcerigi = await FileIO.ReadTextAsync(file);
-                        dosyaIcerikleri.Add(dosyaIcerigi);
+                        string fileContent = await FileIO.ReadTextAsync(file);
+                        fileContents.Add(fileContent);
 
                         // You can start processing the content of each file here.
                         // For example, you can analyze the commands in the file.
@@ -58,36 +58,36 @@ namespace prgToMPR02
                 }
 
                 // After processing the file contents, you can perform the necessary conversion tasks.
-                await ConvertAndSave(folder, dosyaIcerikleri, prgFiles);
+                await ConvertAndSave(folder, fileContents, prgFiles);
             }
         }
 
-        private async Task ConvertAndSave(StorageFolder folder, List<string> dosyaIcerikleri, IReadOnlyList<StorageFile> prgFiles)
+        private async Task ConvertAndSave(StorageFolder folder, List<string> fileContents, IReadOnlyList<StorageFile> prgFiles)
         {
-            for (int i = 0; i < dosyaIcerikleri.Count; i++)
+            for (int i = 0; i < fileContents.Count; i++)
             {
-                string dosyaIcerigi = dosyaIcerikleri[i];
+                string fileContent = fileContents[i];
                 StorageFile prgFile = prgFiles[i];
-                string dosyaAdi = prgFile.DisplayName;
+                string fileName = prgFile.DisplayName;
 
                 // Conversion tasks are performed here.
-                // The content of each file is found in the "dosyaIcerigi" variable.
-                string mprIcerik = ConvertPRGtoMPR(dosyaIcerigi, dosyaAdi);
+                // The content of each file is found in the "fileContent" variable.
+                string mprData = ConvertPRGtoMPR(fileContent, fileName);
 
                 // Dosya içeriğini TextBox içine ekleyin
-                TextBoxOutput.Text += $"Folder : {dosyaAdi}\n";
-                //TextBoxOutput.Text += $"{dosyaIcerigi}\n\n";
+                TextBoxOutput.Text += $"Folder : {fileName}\n";
+                //TextBoxOutput.Text += $"{fileContent}\n\n";
 
-                if (!string.IsNullOrEmpty(mprIcerik))
+                if (!string.IsNullOrEmpty(mprData))
                 {
                     // You can retrieve the name of the converted PRG file.
 
-                    await SaveMPRFile(dosyaAdi, mprIcerik, folder); // Save the MPR file
+                    await SaveMPRFile(fileName, mprData, folder); // Save the MPR file
                 }
             }
         }
 
-        private string ConvertPRGtoMPR(string prgIcerik, string dosyaAdi)
+        private string ConvertPRGtoMPR(string prgIcerik, string fileName)
         {
             List<string> mprLines = new List<string>();
             Dictionary<string, double> vars = new Dictionary<string, double>();
@@ -130,13 +130,13 @@ namespace prgToMPR02
             int frzCnt = 0;
             int frzOpCnt = 0;
 
-            string en, enf3, boy, boyf3, th, thf3;
-            en = "";
+            string w, wf3, l, lf3, th, thf3;
+            w = "";
             th = "";
-            boy = "";
-            enf3 = "";
+            l = "";
+            wf3 = "";
             thf3 = "";
-            boyf3 = "";
+            lf3 = "";
 
             // Add the MPR header section
             mprLines.Add("[H");
@@ -216,7 +216,7 @@ namespace prgToMPR02
 
                 if (trimmedLine.StartsWith("|4 "))
                 {
-                    en = trimmedLine.Split(new string[] { "|4 " }, StringSplitOptions.None)[1];
+                    w = trimmedLine.Split(new string[] { "|4 " }, StringSplitOptions.None)[1];
                 }
                 else if (trimmedLine.StartsWith("|5 "))
                 {
@@ -224,14 +224,14 @@ namespace prgToMPR02
                 }
                 else if (trimmedLine.StartsWith("|6 "))
                 {
-                    boy = trimmedLine.Split(new string[] { "|6 " }, StringSplitOptions.None)[1];
+                    l = trimmedLine.Split(new string[] { "|6 " }, StringSplitOptions.None)[1];
 
-                    if (double.TryParse(en, out double sayi1)) enf3 = sayi1.ToString("F3");
-                    if (double.TryParse(boy, out double sayi2)) boyf3 = sayi2.ToString("F3");
+                    if (double.TryParse(w, out double sayi1)) wf3 = sayi1.ToString("F3");
+                    if (double.TryParse(l, out double sayi2)) lf3 = sayi2.ToString("F3");
                     if (double.TryParse(th, out double sayi3)) thf3 = sayi3.ToString("F3");
 
-                    mprLines.Add("_BSX=" + enf3);
-                    mprLines.Add("_BSY=" + boyf3);
+                    mprLines.Add("_BSX=" + wf3);
+                    mprLines.Add("_BSY=" + lf3);
                     mprLines.Add("_BSZ=" + thf3);
 
                     mprLines.Add("_FNX = 0.000");
@@ -240,17 +240,17 @@ namespace prgToMPR02
                     mprLines.Add("_RNY = 0.000");
                     mprLines.Add("_RNZ = 0.000");
 
-                    mprLines.Add("_RX=" + enf3);
-                    mprLines.Add("_RY=" + boyf3);
+                    mprLines.Add("_RX=" + wf3);
+                    mprLines.Add("_RY=" + lf3);
 
                     mprLines.Add("KM = \"X-=;X+=;Y-=;Y+=;\"");
                     mprLines.Add("KM = \"LeftWork\"");
 
                     mprLines.Add("");
                     mprLines.Add("[001");
-                    mprLines.Add("Lo=\"" + en + "\"");
+                    mprLines.Add("Lo=\"" + w + "\"");
                     mprLines.Add("KM=\"\"");
-                    mprLines.Add("La=\"" + boy + "\"");
+                    mprLines.Add("La=\"" + l + "\"");
                     mprLines.Add("KM=\"\"");
                     mprLines.Add("Ep=\"" + th + "\"");
                     mprLines.Add("KM=\"\"");
@@ -278,11 +278,11 @@ namespace prgToMPR02
                     }
                     whileLoopIndexEnd = 0;
 
-                    for (int j = i; j < lines.Length ; j++) if (lines[j].StartsWith("#WEND")) whileLoopIndexEnd = j;
+                    for (int j = i; j < lines.Length; j++) if (lines[j].StartsWith("#WEND")) whileLoopIndexEnd = j;
 
                     if (whileLoopIndexEnd == 0) // Error While Loop without WEND
-                    { 
-                        ShowErrorMessage("Bir WHILE döngüsü WEND ile sonlanmamış");
+                    {
+                        ShowErrorMessage("The WHILE loop has not ended with WEND.");
                         break;
                     }
 
@@ -305,8 +305,8 @@ namespace prgToMPR02
                     string varName = parcalar[0].Trim();
                     string str = parcalar[1].Trim();
 
-                    if (str == "DX") str = en;
-                    if (str == "DY") str = boy;
+                    if (str == "DX") str = w;
+                    if (str == "DY") str = l;
 
 
                     str = ReplaceVariables(vars, str);
@@ -466,9 +466,9 @@ namespace prgToMPR02
                     // The x var shows how deep it will enter on the panel. will be x tool depth
 
                     depth = x;
-                    x = en;
+                    x = w;
 
-                    mprLines.Add("<103 \\BohrHoriz\\ \\||\\");
+                    mprLines.Add("<103 \\Horizontal Drilling\\ \\||\\");
                     mprLines.Add("XA=\"" + x + "\"");
                     mprLines.Add("YA=\"" + y + "\"");
                     mprLines.Add("ZA=\"" + z + "\"");
@@ -541,7 +541,7 @@ namespace prgToMPR02
             }
 
             mprLines.Add("<101 \\Commments:\\");
-            mprLines.Add("KM=\"Original file :" + dosyaAdi + "\"");
+            mprLines.Add("KM=\"Original file :" + fileName + "\"");
             mprLines.Add("KM=\"Copyright VITEM\"");
             mprLines.Add("!"); // End of File
 
@@ -550,11 +550,11 @@ namespace prgToMPR02
         }
 
 
-        private async Task SaveMPRFile(string dosyaAdi, string mprIcerik, StorageFolder folder)
+        private async Task SaveMPRFile(string fileName, string mprData, StorageFolder folder)
         {
             StorageFolder altKlasor = await folder.CreateFolderAsync("MPR", CreationCollisionOption.OpenIfExists);
-            StorageFile mprDosya = await altKlasor.CreateFileAsync(dosyaAdi + ".mpr", CreationCollisionOption.ReplaceExisting);
-            await FileIO.WriteTextAsync(mprDosya, mprIcerik);
+            StorageFile mprDosya = await altKlasor.CreateFileAsync(fileName + ".mpr", CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(mprDosya, mprData);
         }
 
         static string ReplaceVariables(Dictionary<string, double> vars, string denklem)
@@ -598,9 +598,13 @@ namespace prgToMPR02
 
         async void ShowErrorMessage(string errorMessage)
         {
-            var dialog = new MessageDialog(errorMessage, "Hata");
+            var dialog = new MessageDialog(errorMessage, "Error");
             await dialog.ShowAsync();
         }
 
+        private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
