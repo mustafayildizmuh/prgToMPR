@@ -75,7 +75,7 @@ namespace prgToMPR02
                 string mprData = ConvertPRGtoMPR(fileContent, fileName);
 
                 // Dosya içeriğini TextBox içine ekleyin
-                TextBoxOutput.Text += $"Folder : {fileName}\n";
+                TextBoxOutput.Text += $"{fileName}\n";
                 //TextBoxOutput.Text += $"{fileContent}\n\n";
 
                 if (!string.IsNullOrEmpty(mprData))
